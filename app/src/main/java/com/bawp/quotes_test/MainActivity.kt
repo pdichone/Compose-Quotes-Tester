@@ -1,11 +1,14 @@
 package com.bawp.quotes_test
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
@@ -18,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.bawp.quotes_test.data.Quote
+import com.bawp.quotes_test.data.QuotesRepository
 import com.bawp.quotes_test.ui.theme.QuotesTestTheme
 
 class MainActivity : ComponentActivity() {
@@ -64,15 +69,21 @@ import androidx.compose.runtime.setValue
     val counter = remember {
         mutableStateOf(0)
     }
-    val quotes = listOf("Hello world", "Be you",  "Be me", "Not really")
-    QuotesContent(counter, quotesList = quotes){
-        counter.value = it.plus(1)
+    val quotes = QuotesRepository().getQuotes()
+
+//    QuotesContent(counter, quotesList = quotes){
+//        counter.value = it.plus(1)
+//    }
+
+    QuotesList(list = quotes){
+        Log.d("Quote", "QuotesApp: $it")
     }
 }
 @Composable
-fun QuotesContent(counter: MutableState<Int>,
-                  quotesList: List<String>,
-                   onButtonClicked: (Int) -> Unit) {
+fun QuotesContent(
+    counter: MutableState<Int>,
+    quotesList: List<Quote>,
+    onButtonClicked: (Int) -> Unit) {
     /*
     Part 1:
       hoist the state to the calling composable
@@ -97,7 +108,7 @@ fun QuotesContent(counter: MutableState<Int>,
         Column( verticalArrangement = Arrangement.Center,
               horizontalAlignment = Alignment.CenterHorizontally) {
 
-            QuotesCard(quote = quotesList[counter.value % quotesList.size])
+           // QuotesCard(quote = quotesList[counter.value % quotesList.size])
 //            Box(modifier = Modifier.fillMaxWidth()
 //                .height(220.dp)
 //                .padding(6.dp)
@@ -130,13 +141,43 @@ fun QuotesContent(counter: MutableState<Int>,
 }
 
 @Composable
-fun QuotesCard(quote: String) {
+fun QuotesList(list: List<Quote>, onItemClicked: (String) -> Unit ) {
+    Scaffold(topBar = {
+        TopAppBar() {
+            Text(text = "Quotes")
+
+        }
+    }) {
+        if (!list.isNullOrEmpty()) {
+            LazyColumn(modifier = Modifier.padding(start = 36.dp,
+                                                  top = 12.dp,
+                                                  end = 0.dp,
+                                                  bottom = 12.dp)){
+                items(items = list){ item: Quote ->
+                    QuotesCard(quote = item){
+                        onItemClicked(it)
+                    }
+
+                }
+            }
+
+        }else {
+            Text(text = "No Quotes Found :(")
+        }
+
+    }
+
+}
+
+@Composable
+fun QuotesCard(quote: Quote, onItemClicked: (String) -> Unit) {
 
     Column(modifier = Modifier
         .wrapContentSize()
         .padding(12.dp)
         .height(190.dp)
         .clickable(onClick = {
+            onItemClicked(quote.quote)
             // actions.gotoDetails(quote.quote, quote.author)
 
         })
@@ -151,7 +192,7 @@ fun QuotesCard(quote: String) {
             )
 
         Text(
-            text = quote,
+            text = quote.quote,
             style = typography.body1,
             color = MaterialTheme.colors.onBackground,
             modifier = Modifier.padding(start = 12.dp)
@@ -164,7 +205,7 @@ fun QuotesCard(quote: String) {
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(12.dp),
-                text = quote,
+                text = quote.author,
                 style = typography.caption,
                 color = MaterialTheme.colors.onBackground
                 )

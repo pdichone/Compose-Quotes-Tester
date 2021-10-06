@@ -128,16 +128,9 @@ fun QuotesContent(
             }) {
                 Icon(imageVector = Icons.Default.Star, contentDescription ="Icon" )
                 Text(text = "Inspire me")
-
-
             }
         }
-
-
     }
-
-
-
 }
 
 @Composable
@@ -181,8 +174,14 @@ fun QuotesCard(quote: Quote, onItemClicked: (String) -> Unit) {
             // actions.gotoDetails(quote.quote, quote.author)
 
         })
+        //added this for dramatic effect :)
+        .clip(shape = CircleShape.copy(topEnd = CornerSize(0.dp),
+            topStart = CornerSize(23.dp),
+            bottomStart = CornerSize(0.dp),
+            bottomEnd = CornerSize(23.dp)))
         .background(MaterialTheme.colors.primaryVariant)
         .padding(12.dp)
+
           ) {
 
         Text(
@@ -209,8 +208,10 @@ fun QuotesCard(quote: Quote, onItemClicked: (String) -> Unit) {
                 style = typography.caption,
                 color = MaterialTheme.colors.onBackground
                 )
+
             Spacer(Modifier.height(8.dp))
         }
+
 
     }
 }

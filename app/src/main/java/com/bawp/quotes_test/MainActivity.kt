@@ -165,6 +165,7 @@ fun QuotesList(list: List<Quote>, onItemClicked: (String) -> Unit ) {
 @Composable
 fun QuotesCard(quote: Quote, onItemClicked: (String) -> Unit) {
 
+    //hello
     Column(modifier = Modifier
         .wrapContentSize()
         .padding(12.dp)

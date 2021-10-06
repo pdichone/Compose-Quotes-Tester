@@ -9,9 +9,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Quote(
     /**
+     * test
      *  make sure that the fields match the json fields!!
      *  or change the add the atSerialName("match_name_from_json_field")
      */
+
     @SerialName("quoteText")
     val quote: String,
     @SerialName("quoteAuthor")

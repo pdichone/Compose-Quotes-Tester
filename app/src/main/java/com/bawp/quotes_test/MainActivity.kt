@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bawp.quotes_test.data.Quote
@@ -69,7 +70,7 @@ import androidx.compose.runtime.setValue
     val counter = remember {
         mutableStateOf(0)
     }
-    val quotes = QuotesRepository().getQuotes()
+    val quotes = QuotesRepository().getAllQuotes(context = LocalContext.current)
 
 //    QuotesContent(counter, quotesList = quotes){
 //        counter.value = it.plus(1)
@@ -139,6 +140,7 @@ fun QuotesList(list: List<Quote>, onItemClicked: (String) -> Unit ) {
         TopAppBar() {
             Text(text = "Quotes")
 
+
         }
     }) {
         if (!list.isNullOrEmpty()) {
@@ -165,7 +167,6 @@ fun QuotesList(list: List<Quote>, onItemClicked: (String) -> Unit ) {
 @Composable
 fun QuotesCard(quote: Quote, onItemClicked: (String) -> Unit) {
 
-    //hello
     Column(modifier = Modifier
         .wrapContentSize()
         .padding(12.dp)

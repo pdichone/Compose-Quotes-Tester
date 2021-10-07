@@ -23,11 +23,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.bawp.quotes_test.data.Quote
 import com.bawp.quotes_test.data.QuotesRepository
 import com.bawp.quotes_test.model.QuotesViewModel
+import com.bawp.quotes_test.navigation.QuoteNavigation
 import com.bawp.quotes_test.ui.theme.QuotesTestTheme
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +42,8 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colors.background) {
-                    QuotesApp( viewModel = QuotesViewModel(QuotesRepository(), LocalContext.current))
 
+                    QuotesApp()
                 }
             }
         }
@@ -46,7 +52,10 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun QuotesApp(viewModel: QuotesViewModel = hiltViewModel()) {
+fun QuotesApp() {
+
+    QuoteNavigation()
+   // val MViewModel = androidx.lifecycle.viewmodel.compose.viewModel<QuotesViewModel>()
     /*
       We've now hoisted the state to the calling (this composable)
       composable.
@@ -69,18 +78,15 @@ import androidx.compose.runtime.setValue
      */
    // var counter by remember { mutableStateOf(0) }
 
-    val counter = remember {
-        mutableStateOf(0)
-    }
+//    val counter = remember {
+//        mutableStateOf(0)
+//    }
    // val quotes = QuotesRepository().getAllQuotes(context = LocalContext.current)
 
 //    QuotesContent(counter, quotesList = quotes){
 //        counter.value = it.plus(1)
 //    }
 
-    QuotesList(quotesViewModel = viewModel){
-        Log.d("Quote", "QuotesApp: $it")
-    }
 }
 @Composable
 fun QuotesContent(
@@ -136,102 +142,12 @@ fun QuotesContent(
     }
 }
 
-@Composable
-fun QuotesList(
-    quotesViewModel: QuotesViewModel,
-    onItemClicked: (String) -> Unit
-              ) {
-    Scaffold(topBar = {
-        TopAppBar() {
-            Text(text = "Quotes")
 
-
-        }
-    }) {
-
-        if (!quotesViewModel.data.value.data.isNullOrEmpty()) {
-            LazyColumn(modifier = Modifier.padding(start = 36.dp,
-                                                  top = 12.dp,
-                                                  end = 0.dp,
-                                                  bottom = 12.dp)){
-                val mList = quotesViewModel.data.value.data
-
-
-                items(items = mList!!){ item: Quote ->
-                    QuotesCard(quote = item){
-                        onItemClicked(it)
-                    }
-
-                }
-            }
-
-        }else {
-            Text(text = "No Quotes Found :(")
-        }
-
-    }
-
-}
-
-@Composable
-fun QuotesCard(
-    quote: Quote,
-    onItemClicked: (String) -> Unit,
-              ) {
-
-    Column(modifier = Modifier
-        .wrapContentSize()
-        .padding(12.dp)
-        .height(190.dp)
-        .clickable(onClick = {
-            onItemClicked(quote.quote)
-            // actions.gotoDetails(quote.quote, quote.author)
-
-        })
-        //added this for dramatic effect :)
-        .clip(shape = CircleShape.copy(topEnd = CornerSize(0.dp),
-            topStart = CornerSize(23.dp),
-            bottomStart = CornerSize(0.dp),
-            bottomEnd = CornerSize(23.dp)))
-        .background(MaterialTheme.colors.primaryVariant)
-        .padding(12.dp)
-
-          ) {
-
-        Text(
-            text = """ " """,
-            style = typography.h4,
-            color = MaterialTheme.colors.onBackground
-            )
-
-        Text(
-            text = quote.quote,
-            style = typography.body1,
-            color = MaterialTheme.colors.onBackground,
-            modifier = Modifier.padding(start = 12.dp)
-            )
-
-        Spacer(Modifier.height(12.dp))
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            Text(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(12.dp),
-                text = quote.author,
-                style = typography.caption,
-                color = MaterialTheme.colors.onBackground
-                )
-
-            Spacer(Modifier.height(8.dp))
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     QuotesTestTheme {
-      QuotesApp()
+      //QuotesApp()
     }
 }

@@ -19,10 +19,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.bawp.quotes_test.data.Quote
 import com.bawp.quotes_test.data.QuotesRepository
+import com.bawp.quotes_test.model.QuotesViewModel
 import com.bawp.quotes_test.ui.theme.QuotesTestTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colors.background) {
-                    QuotesApp()
+                    QuotesApp( viewModel = QuotesViewModel(QuotesRepository(), LocalContext.current))
 
                 }
             }
@@ -43,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun QuotesApp() {
+fun QuotesApp(viewModel: QuotesViewModel = hiltViewModel()) {
     /*
       We've now hoisted the state to the calling (this composable)
       composable.
@@ -69,21 +72,21 @@ import androidx.compose.runtime.setValue
     val counter = remember {
         mutableStateOf(0)
     }
-    val quotes = QuotesRepository().getQuotes()
+   // val quotes = QuotesRepository().getAllQuotes(context = LocalContext.current)
 
 //    QuotesContent(counter, quotesList = quotes){
 //        counter.value = it.plus(1)
 //    }
 
-    QuotesList(list = quotes){
+    QuotesList(quotesViewModel = viewModel){
         Log.d("Quote", "QuotesApp: $it")
     }
 }
 @Composable
 fun QuotesContent(
     counter: MutableState<Int>,
-    quotesList: List<Quote>,
-    onButtonClicked: (Int) -> Unit) {
+    onButtonClicked: (Int) -> Unit
+                 ) {
     /*
     Part 1:
       hoist the state to the calling composable
@@ -134,19 +137,27 @@ fun QuotesContent(
 }
 
 @Composable
-fun QuotesList(list: List<Quote>, onItemClicked: (String) -> Unit ) {
+fun QuotesList(
+    quotesViewModel: QuotesViewModel,
+    onItemClicked: (String) -> Unit
+              ) {
     Scaffold(topBar = {
         TopAppBar() {
             Text(text = "Quotes")
 
+
         }
     }) {
-        if (!list.isNullOrEmpty()) {
+
+        if (!quotesViewModel.data.value.data.isNullOrEmpty()) {
             LazyColumn(modifier = Modifier.padding(start = 36.dp,
                                                   top = 12.dp,
                                                   end = 0.dp,
                                                   bottom = 12.dp)){
-                items(items = list){ item: Quote ->
+                val mList = quotesViewModel.data.value.data
+
+
+                items(items = mList!!){ item: Quote ->
                     QuotesCard(quote = item){
                         onItemClicked(it)
                     }
@@ -163,9 +174,11 @@ fun QuotesList(list: List<Quote>, onItemClicked: (String) -> Unit ) {
 }
 
 @Composable
-fun QuotesCard(quote: Quote, onItemClicked: (String) -> Unit) {
+fun QuotesCard(
+    quote: Quote,
+    onItemClicked: (String) -> Unit,
+              ) {
 
-    //hello
     Column(modifier = Modifier
         .wrapContentSize()
         .padding(12.dp)
@@ -212,8 +225,6 @@ fun QuotesCard(quote: Quote, onItemClicked: (String) -> Unit) {
 
             Spacer(Modifier.height(8.dp))
         }
-
-
     }
 }
 
